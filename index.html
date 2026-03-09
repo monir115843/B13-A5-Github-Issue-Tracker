@@ -84,7 +84,42 @@
         </main>
     </div>
 
-       <script>
+     <dialog id="issue_modal" class="modal">
+        <div class="modal-box bg-white max-w-3xl rounded-[32px] p-10">
+            <h2 id="m-title" class="text-3xl font-black text-slate-900 mb-4"></h2>
+            <div class="flex items-center gap-3 mb-6">
+                <span id="m-status-badge" class="modal-status-badge"></span>
+                <span class="text-slate-400 font-bold text-sm">Opened by <span id="m-author" class="text-slate-700"></span></span>
+            </div>
+            <p id="m-desc" class="text-slate-500 font-medium leading-relaxed mb-8"></p>
+            <div class="bg-slate-50 p-6 rounded-2xl flex justify-between items-center">
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase">Assignee</p>
+                    <p class="font-black text-slate-800" id="m-assignee-val"></p>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs font-bold text-slate-400 uppercase">Priority</p>
+                    <span id="m-priority-chip" class="px-4 py-1 rounded-full text-white text-xs font-bold"></span>
+                </div>
+            </div>
+            <div class="modal-action">
+                <form method="dialog"><button class="btn bg-[#4F12F9] text-white border-none px-8 rounded-xl font-black">Close</button></form>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop bg-slate-900/40"><button>close</button></form>
+    </dialog>
+
+    <dialog id="new_issue_modal" class="modal">
+        <div class="modal-box bg-white rounded-3xl">
+            <h3 class="font-black text-xl mb-4">Create New Issue</h3>
+            <p class="text-slate-500 mb-6">Submit a new bug or request.</p>
+            <div class="modal-action">
+                <form method="dialog"><button class="btn">Close</button></form>
+            </div>
+        </div>
+    </dialog>
+
+     <script>
         let allIssues = [];
         let currentTab = 'all';
 
