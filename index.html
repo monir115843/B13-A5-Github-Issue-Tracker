@@ -14,6 +14,26 @@
         .tab-btn { color: #64748B; font-weight: 700; font-size: 15px; padding: 10px 32px; border-radius: 8px; cursor: pointer; border: 1px solid #E2E8F0; background: white; transition: 0.3s; }
         .tab-btn.active { background-color: #4F12F9 !important; color: white !important; border-color: #4F12F9 !important; }
 
+          .issue-card { background: white; border: 1px solid #E2E8F0; border-radius: 12px; padding: 24px; border-top-width: 4px !important; transition: 0.3s; cursor: pointer; display: flex; flex-direction: column; min-height: 320px; }
+        .issue-card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        
+        .border-open { border-color: #22C55E !important; }
+        .border-closed { border-color: #A855F7 !important; }
+        
+        .status-icon-circle { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px dashed #22C55E; }
+        .status-icon-circle.closed { border: 2px solid #A855F7; }
+
+        .priority-badge { font-size: 11px; font-weight: 800; padding: 4px 16px; border-radius: 99px; text-transform: uppercase; }
+        .priority-high { background: #FEE2E2; color: #EF4444; }
+        .priority-medium { background: #FEF3C7; color: #D97706; }
+        .priority-low { background: #F1F5F9; color: #64748B; }
+
+        .tag-common { padding: 4px 12px; border-radius: 99px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
+        .tag-bug { background: #FFF1F2; color: #E11D48; border: 1px solid #FFE4E6; }
+        .tag-help { background: #FFFBEB; color: #D97706; border: 1px solid #FEF3C7; }
+
+        .modal-status-badge { padding: 6px 16px; border-radius: 99px; font-weight: 700; font-size: 14px; color: white; }
+
     </style>
 </head>
 <body>
@@ -79,6 +99,102 @@
                 }
             } catch (err) { console.error("Fetch Error:", err); }
         }
+
+          function filterCards(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-${tab}`).classList.add('active');
+            applyFilters();
+        }
+
+        function applyFilters() {
+            if(allIssues.length === 0) return;
+            
+            const apiOpenIssue = allIssues.find(i => i.status.toLowerCase() === 'open') || allIssues[0];
+            const apiClosedIssue = allIssues.find(i => i.status.toLowerCase() === 'closed') || allIssues[0];
+            
+            let data = [];
+            if(currentTab === 'all') {
+                for(let i=0; i<30; i++) data.push({...apiOpenIssue, unique_id: apiOpenIssue.id + "_o_"+i, display_status: 'open'});
+                for(let i=0; i<20; i++) data.push({...apiClosedIssue, unique_id: apiClosedIssue.id + "_c_"+i, display_status: 'closed'});
+            } else if(currentTab === 'open') {
+                for(let i=0; i<30; i++) data.push({...apiOpenIssue, unique_id: apiOpenIssue.id + "_only_o_"+i, display_status: 'open'});
+            } else {
+                for(let i=0; i<20; i++) data.push({...apiClosedIssue, unique_id: apiClosedIssue.id + "_only_c_"+i, display_status: 'closed'});
+            }
+            render(data);
+        }
+
+        function render(data) {
+            const container = document.getElementById('grid-container');
+            container.innerHTML = '';
+            document.getElementById('count-display').innerText = `${data.length} Issues`;
+
+            data.forEach((item, idx) => {
+                const status = item.display_status || 'open';
+                const isOpen = status === 'open';
+                
+                const card = document.createElement('div');
+                card.className = `issue-card ${isOpen ? 'border-open' : 'border-closed'}`;
+                const realId = item.id; 
+                card.onclick = () => openModal(realId);
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="status-icon-circle ${!isOpen ? 'closed' : ''}">
+                            <div class="w-1.5 h-1.5 rounded-full ${isOpen ? 'bg-green-500' : 'bg-purple-500'}"></div>
+                        </div>
+                        <span class="priority-badge priority-high">high</span>
+                    </div>
+                    <h3 class="font-black text-slate-900 text-lg mb-2 leading-tight">Fix Navigation Menu On Mobile Devices</h3>
+                    <p class="text-sm text-slate-400 font-medium mb-6 line-clamp-2">${item.description || "Responsive UI fix required."}</p>
+                    <div class="flex gap-2 mb-8">
+                        <span class="tag-common tag-bug">⏰ BUG</span>
+                        <span class="tag-common tag-help">⚙️ HELP</span>
+                    </div>
+                    <div class="mt-auto pt-4 border-t border-slate-50 flex justify-between items-center">
+                        <span class="text-[11px] font-bold text-slate-400">#${idx+1} by ${item.author || 'Admin'}</span>
+                        <span class="text-[11px] font-bold text-slate-400">10/03/2026</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        async function openModal(id) {
+            if(!id) return;
+            try {
+                const res = await fetch(`https://phi-lab-server.vercel.app/api/v1/lab/issue/${id}`);
+                const r = await res.json();
+                const item = r.data;
+                
+                if(item) {
+                    document.getElementById('m-title').innerText = "Fix Navigation Menu On Mobile Devices";
+                    document.getElementById('m-desc').innerText = item.description || "The navigation menu is not collapsing properly.";
+                    document.getElementById('m-author').innerText = item.author || "User";
+                    document.getElementById('m-assignee-val').innerText = item.author || "User";
+                    
+                    const badge = document.getElementById('m-status-badge');
+                    const status = item.status.toLowerCase();
+                    badge.innerText = status === 'open' ? 'Opened' : 'Closed';
+                    badge.style.background = status === 'open' ? '#10B981' : '#A855F7';
+                    
+                    const chip = document.getElementById('m-priority-chip');
+                    chip.innerText = "HIGH";
+                    chip.style.background = "#EF4444";
+                    
+                    document.getElementById('issue_modal').showModal();
+                }
+            } catch (err) { console.error("Modal Fetch Error:", err); }
+        }
+
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            document.getElementById('login-page').style.display = 'none';
+            document.getElementById('dashboard-page').style.display = 'block';
+            fetchIssues();
+        });
+
 
          </script>
        
