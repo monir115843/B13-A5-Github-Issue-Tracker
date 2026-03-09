@@ -29,5 +29,35 @@
             </form>
         </div>
     </div>
+
+      <div id="dashboard-page" class="hidden min-h-screen">
+        <header class="bg-white border-b border-gray-100 px-10 py-6 sticky top-0 z-50 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="Logo" class="w-10 h-10">
+                <span class="text-2xl font-black tracking-tighter text-slate-800">GitHub Issues</span>
+            </div>
+            <div class="flex items-center gap-6">
+                <input type="text" id="search-bar" placeholder="Search issues..." class="w-80 h-12 bg-gray-50 px-6 rounded-2xl border border-gray-100 text-sm font-bold">
+                <button onclick="document.getElementById('new_issue_modal').showModal()" class="bg-[#4F12F9] text-white px-6 h-12 rounded-xl font-black">+ New Issue</button>
+            </div>
+        </header>
+
+        <main class="p-10 max-w-[1440px] mx-auto w-full">
+            <div class="bg-white p-8 rounded-[24px] border border-gray-100 mb-8">
+                <div class="flex items-center gap-3 mb-10">
+                    <div id="btn-all" onclick="filterCards('all')" class="tab-btn active">All</div>
+                    <div id="btn-open" onclick="filterCards('open')" class="tab-btn">Open</div>
+                    <div id="btn-closed" onclick="filterCards('closed')" class="tab-btn">Closed</div>
+                </div>
+                <div class="flex items-center gap-5">
+                    <div class="w-14 h-14 bg-[#F1E9FF] rounded-xl flex items-center justify-center">
+                        <img src="https://cdn-icons-png.flaticon.com/512/595/595067.png" class="w-7 h-7" alt="icon">
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-black text-slate-900" id="count-display">0 Issues</h2>
+                        <p class="text-slate-400 font-bold">Manage your project tracking</p>
+                    </div>
+                </div>
+            </div>
 </body>
 </html>
