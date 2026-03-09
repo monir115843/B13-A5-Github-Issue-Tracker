@@ -60,11 +60,15 @@
                 </div>
             </div>
 
+             <div id="grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+        </main>
+    </div>
+
        <script>
         let allIssues = [];
         let currentTab = 'all';
 
-        // COMMIT 4: API Integration
+        //API Integration
         async function fetchIssues() {
             try {
                 const res = await fetch('https://phi-lab-server.vercel.app/api/v1/lab/issues');
